@@ -158,7 +158,9 @@ def identify_runs(matrix, n=0, threshold=10, plot = False):
 
     # p is an identically-sized array of Node objects, which will allow us
     # to define a tree structure.
-    p = [[Node() for y in xrange(y_max)] for x in xrange(x_max)]
+    p_max_origin = [[[] for y in xrange(y_max)] for x in xrange(x_max)]
+    p_max_bottom = [[[] for y in xrange(y_max)] for x in xrange(x_max)]
+    p_max_score  = [[0  for y in xrange(y_max)] for x in xrange(x_max)]
 
     # First, go through the matrix left to right, top to bottom. If we find a
     # black square, then for every allowable step, go a step in that direction
@@ -174,9 +176,9 @@ def identify_runs(matrix, n=0, threshold=10, plot = False):
                     j = y + step[1]
                     if (i < x_max) & (j < y_max):
                         if m[i][j] == 1:
-                            if p[i][j].max_score < p[x][y].max_score + 1:
-                                p[i][j].max_score = p[x][y].max_score + 1
-                                p[i][j].max_origin = [x, y]
+                            if p_max_score[i][j] < p_max_score[x][y] + 1:
+                                p_max_score[i][j] = p_max_score[x][y] + 1
+                                p_max_origin[i][j] = [x, y]
 
     # Go through the grid again, in the same direction. This time, if we find
     # a black square, call this [x, y] and use the Node array to step backward
@@ -189,12 +191,12 @@ def identify_runs(matrix, n=0, threshold=10, plot = False):
         for y in xrange(y_max):
             i = x
             j = y
-            while p[i][j].max_origin != []:
-                i, j = p[i][j].max_origin
+            while p_max_origin[i][j] != []:
+                i, j = p_max_origin[i][j]
 
-            if p[i][j].max_score < p[x][y].max_score:
-                p[i][j].max_score = p[x][y].max_score
-                p[i][j].max_bottom = [x, y]
+            if p_max_score[i][j] < p_max_score[x][y]:
+                p_max_score[i][j] = p_max_score[x][y]
+                p_max_bottom[i][j] = [x, y]
 
     # Finally, go through the grid again to collect all the filtered runs.
     # If you find a black dot which is a part of a run which is long enough,
@@ -208,13 +210,13 @@ def identify_runs(matrix, n=0, threshold=10, plot = False):
         for y in xrange(y_max):
             i = x
             j = y
-            if p[x][y].max_score >= threshold:
+            if p_max_score[x][y] >= threshold:
                 path = [[i, j]]
-                while p[i][j].max_origin != []:
-                    path.append(p[i][j].max_origin)
-                    i, j = p[i][j].max_origin
+                while p_max_origin[i][j] != []:
+                    path.append(p_max_origin[i][j])
+                    i, j = p_max_origin[i][j]
 
-                if p[i][j].max_bottom == [x, y]:
+                if p_max_bottom[i][j] == [x, y]:
                     runs.append(path[::-1])
 
     # Make a matrix of zeros and fill it in with all the runs we found
