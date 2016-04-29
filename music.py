@@ -1,4 +1,5 @@
 import sys
+import copy
 egg_path='./midi-0.2.3-py2.7.egg'
 sys.path.append(egg_path)
 import midi
@@ -125,7 +126,7 @@ def flatten(pattern):
     # with absolute tick values instead of relative.
 
     # Copy the original pattern
-    a = midi.Pattern([midi.Track([event for event in track]) for track in pattern])
+    a = copy.copy(pattern)
 
     # Make the tick values absolute
     a.make_ticks_abs()
@@ -147,7 +148,7 @@ def identify_runs(matrix, n=0, threshold=10, plot = False):
 
     # The allowable steps when creating a run, in +x, +y format. We can search
     # for only diagonal runs by setting steps = [[1, 1]], for example.
-    steps = [[1, 1], [2, 2], [3, 3], [1, 2], [2, 1], [3, 1], [1, 3]]
+    steps = [[1, 1], [2, 2], [1, 2], [2, 1]]
 
     # Filter the matrix for the given interval.
     m = find_intervals(matrix, n, [0, 1])
