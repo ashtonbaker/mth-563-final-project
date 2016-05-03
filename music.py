@@ -58,13 +58,13 @@ def all_runs(matrix, threshold = 10, quiet = True):
                             'transposition': t})
     return output
 
-def comparison_matrix(pattern_1, pattern_2):
+def comparison_matrix(pattern_1, pattern_2, range_1=[None, None], range_2=[None, None]):
     # Generates a pitch comparison matrix between pattern A and pattern B where
     # M[x][y] = (B[x] - A[y]) % 12
 
     # Extract the pitch values of the ordered 'Note On' events
-    a = [x.data[0] for x in flatten(pattern_1) if x.name == 'Note On']
-    b = [x.data[0] for x in flatten(pattern_2) if x.name == 'Note On']
+    a = [x.data[0] for x in flatten(pattern_1) if x.name == 'Note On'][range_1[0]:range_1[1]]
+    b = [x.data[0] for x in flatten(pattern_2) if x.name == 'Note On'][range_2[0]:range_2[1]]
 
     # Build a similarity grid by calculating the differences between each pair
     # of pitch values. Optimize this eventually by not using append method.
@@ -100,11 +100,11 @@ def find_intervals(m, search_interval, values):
                 matrix[x][y] = values[1]
     return matrix
 
-def explore(pattern_1, pattern_2, interval=None):
+def explore(pattern_1, pattern_2, interval=None, range_1 = [None, None], range_2 = [None, None]):
     # This function allows
 
     # Generate a comparison matrix for the two patterns
-    matrix = comparison_matrix(pattern_1, pattern_2)
+    matrix = comparison_matrix(pattern_1, pattern_2, range_1, range_2)
 
     # If a particular interval has been selected, filter the grid using the
     # find_intervals function, and plot in black and white. Otherwise, plot in
